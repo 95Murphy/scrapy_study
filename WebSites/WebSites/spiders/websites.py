@@ -1,3 +1,7 @@
+''' 
+  * @author   remonl
+  * @coding    utf-8
+'''
 import scrapy
 import urllib
 import os
