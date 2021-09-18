@@ -1,0 +1,102 @@
+********************* Scrapy *********************
+【思路
+a)	将TXT文件的数据逐行存入列表中（或将其存为字典的key）
+b)	按列表下标读出网站去搜索引擎进行搜索
+c)	取到域名存入新列表】
+
+1.	Scrapy 常用命令
+Scrapy startproject + 项目名：新建 scrapy爬虫项目
+Scrapy genspider + 名称：新建spider
+Scrapy crawl + 项目名称：执行项目
+2.	制作 scrapy 爬虫的四个步骤：
+a)	新建项目（cmd scrapy startproject + 项目名称）：新建一个新的爬虫项目；
+b)	明确目标（编写 items.py）：明确想要抓取的目标；
+c)	制作爬虫（spiders/xxspider.py）:制作爬虫开始爬取网页；
+d)	存储内容（pipelines.py）：设计管道存储爬取内容。
+
+scrapy中文件作用说明
+itcast.py ---> 爬取数据的逻辑处理，此文件为自己创建，非scrapy框架自带
+pipeline.py ---> 对爬取到的数据进行处理
+items.py ---> 存储所爬取的数据
+middlewares.py ---> 此名为下载中间件，对于有反爬策略的网站进行处理，一般在此加 UA池/代理 解决反爬问题
+settings.py ---> 配置文件，如下载延时、管道（pipeline）启用等
+
+3.	Return 与 yield 的区别
+Return：执行后当前函数结束，不再执行后面的语句；
+Yield（生成器的象征）：也具备返回功能，下次调用时从当前yield 开始往下执行
+
+4.	W 与 wb 的区别
+W: 打开即默认创建一个文件，，如果文件已存在，则覆盖写（文件内原始数据会被新写入的数据清空覆盖）
+Wb：以二进制写方式打开，只能写文件，如果文件不存在则创建文件，如果文件已存在则覆盖写
+
+5.	Scrapy中下载中间件的作用
+a)	引擎请求传递给下载器的过程中，下载中间件可以对请求进行一系列处理，比如设置user-agent、设置代理等；
+b)	在下载器完成将response传递给引擎时，下载中间件可以对响应进行一系列的处理。
+【注】scrapy中主要使用下载中间件处理请求，设置随机的代理ip，对请求设置随机的user-agent，目的在于防止爬取网站时的反爬策略。
+
+6.	UA池：user-agent
+作用：将scrapy工程中的请求伪装成不同类型的浏览器身份
+步骤：
+1)	在下载中间件中拦截请求；
+2)	将拦截到的请求的请求信息中的UA进行伪装篡改；
+3)	在配置文件中开启下载中间件。
+middlewares.py 中
+import random
+class MiddleproDownloaderMiddleware(object):
+    # Not all methods need to be defined. If a method is not defined,
+    # scrapy acts as if the downloader middleware does not modify the
+    # passed objects.
+    user_agent_list = [
+        'accept - ranges: bytes'
+        'age: 160738'
+        'cache - control: max - age = 2592000'
+        'content - encoding: gzip'
+        'content - type: application / x - javascript'
+        'date: Fri, 17 Sep 2021 07: 34:07 GMT'
+        'etag: W / "611a169f-112e"'
+        'expires: Fri, 15 Oct 2021 10: 55:0 8 GMT'
+        'last - modified: Mon, 16 Aug 2021 07: 41:19 GMT'
+        'ohc - cache - hit: wz2cm94[4], nbcmcache85[4]'
+        'ohc - response - time: 1 0 0 0 0 0'
+        'server: JSP3 / 2.0.14'
+        'vary: Accept - Encoding'
+    ]
+#拦截所有未发生异常的请求（正常的请求）
+def process_request(self, request, spider):
+        print('process_request')
+        # 使用UA池进行请求的UA伪装
+        #请求头信息  获取到的是字典
+        #这一步可有可无 因为你可以在settings中设置一个共同的User-Agent
+        request.headers['User-Agent'] = random.choice(self.user_agent_list)
+        print(request.headers['User-Agent'])
+        return None
+}
+
+7.	代理池
+作用：将scrapy工程中的请求的ip 设置成不同的
+步骤：
+1)	在下载中间件中拦截请求；
+2)	将拦截到的请求中的IP修改成某一个代理的ip；
+3)	在配置文件中开启下载中间件。
+middlewares.py 中
+class MiddleproDownloaderMiddleware(object):
+     #写两个列表 原因是代理IP的类型中有 http 和 https两种类型
+     # 可被选用的代理IP
+     PROXY_http = [
+            '153.180.102.104:80',
+            '195.208.131.189:56055',
+        ]
+     PROXY_https = [
+            '120.83.49.90:9000',
+            '95.189.112.214:35508',
+        ]
+#拦截所有的异常请求
+def process_exception(self, request, exception, spider):
+     #这一步是必须要用的 因为当你访问一个网站次数过多的时候  你可以使用代理IP继续爬取该网站的数据
+     ## #使用代理池进行请求代理ip的设置
+     # request.url 返回的是请求对象所对应的URL
+     print('process_exception')
+     if request.url.split(':')[0] == 'http':
+         request.meta['proxy'] = random.choice(self.PROXY_http)
+     else:
+         request.meta['proxy'] = random.choice(self.PROXY_https)
