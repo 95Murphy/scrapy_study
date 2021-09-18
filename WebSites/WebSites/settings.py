@@ -1,3 +1,7 @@
+''' 
+  * @author   remonl
+  * @coding    utf-8
+'''
 # Scrapy settings for WebSites project
 #
 # For simplicity, this file contains only settings considered important or
