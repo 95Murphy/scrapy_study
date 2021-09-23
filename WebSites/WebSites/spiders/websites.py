@@ -13,7 +13,7 @@ class WebsitesSpider(scrapy.Spider):
     name = 'websites'
     # 爬取域范围，允许爬虫在这个域名下爬取 可选
     allowed_domains = ['cn.bing.com']
-    # allowed_domains = ['m.baidu.com']
+    
     start_urls = list()
     class_path = os.path.expanduser('websites.txt')
 
@@ -26,11 +26,6 @@ class WebsitesSpider(scrapy.Spider):
 
     def parse(self, response):
         node_list = response.xpath('//div["b_content"]//ol[@id]/li[1]/div[@class="b_title"]')
-        # node_list = response.xpath("./div[@class='result c-container new-pmd']")
-        # node_list = response.xpath('div[@class="result c-container"]/h3/a')
-
-        # current_page = response.xpath('div[@id="page"]/strong/span[@class="pc"]/text()').extract_first()
-        # node_list = response.xpath('div[@class="result c-container"]/h3/a')
 
         for node in node_list:
             # 创建 item 字段对象，用来存储信息
