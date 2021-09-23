@@ -3,6 +3,7 @@
   * @coding    utf-8
 '''
 ********************* Scrapy *********************
+
 scrapy0.25官方文档：https://scrapy-chs.readthedocs.io/zh_CN/latest/index.html
 【说明】日期scrapy 已经更新至 2.x，有较多与官方日前提供的文档不一致的地方，但整体框架未做很大调整，具体细节还需实践发现
        如 在不同引擎（baidu.com、360、cn.bing.com等）爬取不同的数据（title、website、image、video等）
