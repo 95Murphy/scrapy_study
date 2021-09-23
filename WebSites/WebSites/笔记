@@ -3,10 +3,9 @@
   * @coding    utf-8
 '''
 ********************* Scrapy *********************
-【思路
-a)	将TXT文件的数据逐行存入列表中（或将其存为字典的key）
-b)	按列表下标读出网站去搜索引擎进行搜索
-c)	取到域名存入新列表】
+scrapy0.25官方文档：https://scrapy-chs.readthedocs.io/zh_CN/latest/index.html
+【说明】日期scrapy 已经更新至 2.x，有较多与官方日前提供的文档不一致的地方，但整体框架未做很大调整，具体细节还需实践发现
+       如 在不同引擎（baidu.com、360、cn.bing.com等）爬取不同的数据（title、website、image、video等）
 
 1.	Scrapy 常用命令
 Scrapy startproject + 项目名：新建 scrapy爬虫项目
@@ -18,27 +17,19 @@ b)	明确目标（编写 items.py）：明确想要抓取的目标；
 c)	制作爬虫（spiders/xxspider.py）:制作爬虫开始爬取网页；
 d)	存储内容（pipelines.py）：设计管道存储爬取内容。
 
-scrapy中文件作用说明
+2. scrapy中文件作用说明
 itcast.py ---> 爬取数据的逻辑处理，此文件为自己创建，非scrapy框架自带
 pipeline.py ---> 对爬取到的数据进行处理
 items.py ---> 存储所爬取的数据
 middlewares.py ---> 此名为下载中间件，对于有反爬策略的网站进行处理，一般在此加 UA池/代理 解决反爬问题
 settings.py ---> 配置文件，如下载延时、管道（pipeline）启用等
 
-3.	Return 与 yield 的区别
-Return：执行后当前函数结束，不再执行后面的语句；
-Yield（生成器的象征）：也具备返回功能，下次调用时从当前yield 开始往下执行
-
-4.	W 与 wb 的区别
-W: 打开即默认创建一个文件，，如果文件已存在，则覆盖写（文件内原始数据会被新写入的数据清空覆盖）
-Wb：以二进制写方式打开，只能写文件，如果文件不存在则创建文件，如果文件已存在则覆盖写
-
-5.	Scrapy中下载中间件的作用
+3.	Scrapy中下载中间件的作用
 a)	引擎请求传递给下载器的过程中，下载中间件可以对请求进行一系列处理，比如设置user-agent、设置代理等；
 b)	在下载器完成将response传递给引擎时，下载中间件可以对响应进行一系列的处理。
 【注】scrapy中主要使用下载中间件处理请求，设置随机的代理ip，对请求设置随机的user-agent，目的在于防止爬取网站时的反爬策略。
 
-6.	UA池：user-agent
+4.	UA池：user-agent
 作用：将scrapy工程中的请求伪装成不同类型的浏览器身份
 步骤：
 1)	在下载中间件中拦截请求；
@@ -76,7 +67,7 @@ def process_request(self, request, spider):
         return None
 }
 
-7.	代理池
+5.	代理池
 作用：将scrapy工程中的请求的ip 设置成不同的
 步骤：
 1)	在下载中间件中拦截请求；
